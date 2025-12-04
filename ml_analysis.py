@@ -355,12 +355,9 @@ def generate_report(df, results, models, output_dir):
             report.append(f"  {feature}: {importance:.4f}")
         report.append("")
     
-    report.append("CONCLUSIONS AND RECOMMENDATIONS")
-    report.append("-" * 80)
-    report.append("")
+
     report.append("1. MODEL PERFORMANCE:")
     report.append(f"   The {best_name} model achieved the best performance with an R² score of {best_metrics['R² Score']:.4f}.")
-    report.append(f"   This means the model explains approximately {best_metrics['R² Score']*100:.1f}% of the variance in insurance charges.")
     report.append("")
     
     report.append("2. PREDICTION ACCURACY:")
@@ -384,25 +381,10 @@ def generate_report(df, results, models, output_dir):
             for i, (feature, corr) in enumerate(top_corr, 1):
                 report.append(f"   {i}. {feature} (correlation: {corr:.4f})")
     report.append("")
+  
     
-    report.append("4. BUSINESS INSIGHTS:")
-    report.append("   • Smoking status has a significant impact on insurance charges.")
-    report.append("   • Age and BMI are important demographic factors in pricing.")
-    report.append("   • The models can be used to predict charges for new customers.")
-    report.append("   • Feature engineering and hyperparameter tuning could further improve performance.")
-    report.append("")
     
-    report.append("5. RECOMMENDATIONS FOR IMPROVEMENT:")
-    report.append("   • Collect more data to improve model generalization")
-    report.append("   • Perform hyperparameter tuning using grid search or random search")
-    report.append("   • Consider ensemble methods combining multiple models")
-    report.append("   • Explore polynomial features or feature interactions")
-    report.append("   • Implement cross-validation for more robust evaluation")
-    report.append("")
-    
-    report.append("=" * 80)
     report.append("END OF REPORT")
-    report.append("=" * 80)
     
     report_text = "\n".join(report)
     report_path = output_dir / "analysis_report.txt"
@@ -430,32 +412,10 @@ def main():
     output_dir = Path("ml_results")
     output_dir.mkdir(exist_ok=True)
     
-    try:
-        import kagglehub
-        print("Downloading dataset from Kaggle...")
-        dataset_path = kagglehub.dataset_download("mirichoi0218/insurance")
-        csv_path = Path(dataset_path) / "insurance.csv"
-        if not csv_path.exists():
-            raise FileNotFoundError(f"Dataset file not found at {csv_path}")
-    except ImportError:
-        print("kagglehub not available. Looking for local dataset...")
-        possible_paths = [
-            script_dir / "insurance.csv",
-            script_dir / "data" / "insurance.csv",
-            Path.home() / ".kaggle" / "datasets" / "mirichoi0218" / "insurance" / "insurance.csv",
-        ]
-        csv_path = None
-        for path in possible_paths:
-            if path.exists():
-                csv_path = path
-                break
-        
-        if csv_path is None:
-            print("ERROR: Could not find insurance.csv dataset.")
-            print("Please either:")
-            print("  1. Install kagglehub: pip install kagglehub")
-            print("  2. Place insurance.csv in the same directory as this script")
-            sys.exit(1)
+    csv_path = script_dir / "insurance.csv"
+    if not csv_path.exists():
+        print(f"ERROR: Could not find insurance.csv in {script_dir}")
+        sys.exit(1)
     
     print(f"Using dataset: {csv_path}")
     
